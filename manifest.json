@@ -1,0 +1,36 @@
+{
+    "name": "Assistant AdopteUnMec",
+    "version": "1.0",
+    "manifest_version": 2,
+    "icons": {
+        "16": "img/aum_16.png",
+        "48": "img/aum_48.png",
+        "128": "img/aum_128.png"
+    },
+    "background": {
+        "persistent": false,
+        "scripts": ["background.js"]
+    },
+    "description": "Assistant adopteunmec.com",
+    "permissions": ["activeTab", "storage", "contextMenus"],
+    "browser_action": {
+        "default_title": "",
+        "default_popup": "settings.html"
+    },
+    "content_scripts": [{
+        "matches": ["https://www.adopteunmec.com/mySearch/results*", "https://www.adopteunmec.com/gogole*"],
+        "js": [
+            "node_modules/jquery/dist/jquery.min.js",
+            "node_modules/arrive/minified/arrive.min.js",
+            "common.js",
+            "searchResult.js"
+        ]
+    }, {
+        "matches": ["https://www.adopteunmec.com/profile*"],
+        "js": [
+            "node_modules/jquery/dist/jquery.min.js",
+            "common.js",
+            "profile.js"
+        ]
+    }]
+}
