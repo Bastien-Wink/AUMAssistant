@@ -9,7 +9,7 @@
     },
     "background": {
         "persistent": false,
-        "scripts": ["background.js"]
+        "scripts": ["js/background.js"]
     },
     "description": "Assistant adopteunmec.com",
     "permissions": ["activeTab", "storage", "contextMenus"],
@@ -22,15 +22,15 @@
         "js": [
             "node_modules/jquery/dist/jquery.min.js",
             "node_modules/arrive/minified/arrive.min.js",
-            "common.js",
-            "searchResult.js"
+            "js/common.js",
+            "js/searchResult.js"
         ]
     }, {
         "matches": ["https://www.adopteunmec.com/profile*"],
         "js": [
             "node_modules/jquery/dist/jquery.min.js",
-            "common.js",
-            "profile.js"
+            "js/common.js",
+            "js/profile.js"
         ]
     }]
 }
