@@ -1,8 +1,11 @@
 chrome.storage.local.get(['charmedIds', 'burnedIds', 'openedIds'], function(result) {
-    $("body").before("<br/>charmedIds:<br/>");
-    $("body").before(result.charmedIds.join());
-    $("body").before("<br/>burnedIds:<br/>");
-    $("body").before(result.burnedIds.join());
-    $("body").before("<br/>openedIds:<br/>");
-    $("body").before(result.openedIds.join());
+
+  if (result.openedIds instanceof Array == false)
+      result.openedIds = new Array;
+  if (result.burnedIds instanceof Array == false)
+      result.burnedIds = new Array;
+  if (result.charmedIds instanceof Array == false)
+      result.charmedIds = new Array;
+
+    $("body").before(JSON.stringify(result, null, 2));
 });

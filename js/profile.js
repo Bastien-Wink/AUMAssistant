@@ -16,7 +16,7 @@ $(document).on("click", "#hide", function(event) {
 
 $(document).on("click", ".charm", function(event) {
     setProfileCharmed(id);
-    $("body").fadeOut(1000, function() {
+    $(".profil-pic").fadeOut(1000, function() {
         window.close();
     })
 });
