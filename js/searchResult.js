@@ -4,11 +4,26 @@ window.scrollTo(0, 0);
 var countHidden = 0;
 
 //Setting section
-$("#user-grid").before(`
+$("#main").after(`
   <div id="extentionSettings">
-      <input type="checkbox" id="hideCharmed" /> Cacher les profiles charm&eacute;s (ou brul&eacute;s)<br/>
-      <input type="checkbox" id="hideSeen" /> Cacher les profiles ouverts
+    <div class="extentionSettingsContainer">
+      <div class="extentionSettingsItem">
+        <input type="checkbox" id="autoVisit" /> Visites auto<br/>
+        <input type="checkbox" id="hideSeen" /> Cacher les profiles ouverts
+      </div>
+      <div class="extentionSettingsItem">
+        <input type="checkbox" id="hideCharmed" /> Cacher les profiles charm&eacute;s<br/>
+        <input type="checkbox" id="hideBurned" /> Cacher les profiles brul&eacute;s
+      </div>
+      <div class="extentionSettingsItem">
+        <input type="button" id="openAll" value="Ouvrir tous" /><br/>
+      </div>
+    </div>
   </div>`);
+
+$("#main").css({
+    "padding-top": "124px"
+});
 
 //CSS
 $("body").after(`
@@ -63,21 +78,50 @@ $("body").after(`
           margin: 5px 0
       }
       .v3.user-grid .someone.large .heading-box .heading-box-content-wrapper, .v3.user-grid .someone.large .user-actions {
-          margin-top: 13px !important;
+          margin-top: 14px !important;
       }
       .v3.user-grid .someone .user-actions{
         height: 15px;
       }
+      .visitingMark {
+        height: 130px;
+        width: 130px;
+        background: url(https://salarie.preventionpenibilite.fr/espacesalarie/images/loading.gif) no-repeat center;
+        background-size: cover;
+        opacity: 0.4;
+        position: absolute;
+        float: left;
+      }
+      .visitedMark {
+        height: 130px;
+        width: 130px;
+        background: url(https://cdn0.iconfinder.com/data/icons/large-black-icons/512/Apply_ok_check_yes_dialog.png) no-repeat center;
+        background-size: cover;
+        opacity: 0.6;
+        position: absolute;
+      }
       #extentionSettings {
-          border: solid 1px;
-          width: 250px;
-          text-align: left;
-          margin: 0px auto 8px auto;
-          padding: 5px 20px;
+        width: 100%;
+        text-align: left;
+        position: fixed;
+        top: 80px;
+        background: #1c2228;
+        z-index: 999;
+        color: white;
+        padding: 5px 10px;
+      }
+      .extentionSettingsContainer{
+        width: 800px;
+        margin: auto;
+      }
+      .extentionSettingsItem {
+        float: left;
+        padding: 0 0 0 64px;
+        width: 200px;
       }
     </style>`);
 
-chrome.storage.local.get(['hideSeen', 'hideCharmed'], function(result) {
+chrome.storage.local.get(['hideSeen', 'hideCharmed', 'hideBurned'], function(result) {
     if (result.hideSeen == true) {
         $("input#hideSeen").prop('checked', true);
     }
@@ -100,7 +144,47 @@ chrome.storage.local.get(['hideSeen', 'hideCharmed'], function(result) {
         });
         init();
     });
+
+    if (result.hideBurned == true) {
+        $("input#hideBurned").prop('checked', true);
+    }
+    $("input#hideBurned").on("change", function() {
+
+        chrome.storage.local.set({
+            'hideBurned': $(this).is(':checked')
+        });
+        init();
+    });
 });
+
+function visitNext() {
+
+    element = $('.someone').filter(":visible").not(".visited").first();
+
+    if (element == undefined || $("#autoVisit").is(':checked') == false) {
+        return;
+    }
+
+    if (element.find(".view a").attr("href") != undefined) {
+        console.log("visiting " + element.find(".view a").attr("href"))
+
+        element.find(".user-avatar").after('<div class="visitingMark"></div><iframe onload="$(this).remove()" style="position: absolute;left: 999999px;" width="1" height="1" frameborder="0px" scrolling="no" marginheight="0" marginwidth="0"  src="' + element.find(".view a").attr("href") + '"></iframe>');
+
+        $('html, body').animate({
+            scrollTop: element.offset().top - 300
+        }, "slow");
+    } else {
+        console.log("No url found in " + element)
+    }
+
+    setTimeout(function() {
+        $(".visitingMark").remove();
+        element.addClass("visited");
+        element.find(".user-avatar").after("<div class='visitedMark'></div>")
+        visitNext()
+    }, Math.random() * 4000 + 1000)
+
+}
 
 function manageSomeone(element, result) {
     if (element.find(".send-charm").attr("data-id") == undefined) {
@@ -108,26 +192,23 @@ function manageSomeone(element, result) {
         return;
     }
 
-    if ($.inArray(parseInt(element.find(".send-charm").attr("data-id")), result.burnedIds) > -1) {
-        burnedDisplay(element);
+    if ($.inArray(parseInt(element.find(".send-charm").attr("data-id")), result.charmedIds) > -1) {
         if (result.hideCharmed == true) {
             hideElement(element);
-        }else {
-            showElement(element);
+        } else {
+            charmedDisplay(element);
         }
-    } else if ($.inArray(parseInt(element.find(".send-charm").attr("data-id")), result.charmedIds) > -1) {
-        charmedDisplay(element);
-        if (result.hideCharmed == true) {
+    } else if ($.inArray(parseInt(element.find(".send-charm").attr("data-id")), result.burnedIds) > -1) {
+        if (result.hideBurned == true) {
             hideElement(element);
-        }else {
-            showElement(element);
+        } else {
+            burnedDisplay(element);
         }
     } else if ($.inArray(parseInt(element.find(".send-charm").attr("data-id")), result.openedIds) > -1) {
-        openedDisplay(element);
         if (result.hideSeen == true) {
             hideElement(element);
         } else {
-            showElement(element);
+            openedDisplay(element);
         }
     } else {
         newDisplay(element);
@@ -135,10 +216,11 @@ function manageSomeone(element, result) {
 }
 
 function init() {
-    chrome.storage.local.get(['openedIds', 'burnedIds', 'charmedIds', 'hideSeen', 'hideCharmed'], function(result) {
+    chrome.storage.local.get(['openedIds', 'burnedIds', 'charmedIds', 'hideSeen', 'hideCharmed', 'hideBurned'], function(result) {
 
         console.log("hideSeen : " + result.hideSeen);
         console.log("hideCharmed : " + result.hideCharmed);
+        console.log("hideBurned : " + result.hideBurned);
 
         if (result.openedIds instanceof Array == false)
             result.openedIds = new Array;
@@ -156,7 +238,7 @@ function init() {
         console.log(result.charmedIds.length + " charmedIds : ");
         console.log("" + result.charmedIds);
 
-        countHidden = 0 ;
+        countHidden = 0;
         chrome.runtime.sendMessage({
             type: "setCount",
             count: countHidden
@@ -181,6 +263,21 @@ $(document).on("click", ".someone .burnButton", function() {
 $(document).on("click", ".send-charm", function(event) {
     charmedDisplay($(this).closest(".someone"));
     setProfileCharmed($(this).attr("data-id"));
+});
+
+$(document).on("click", "#openAll", function(event) {
+    var count = 0;
+    $(".someone:visible .user-grid-title a").each(function(e) {
+        count = count + 1;
+        if (count >= 10) {
+            return false;
+        }
+        window.open($(this).attr("href"), '_blank');
+    });
+});
+
+$(document).on("change", "#autoVisit", function(event) {
+    visitNext()
 });
 
 init();

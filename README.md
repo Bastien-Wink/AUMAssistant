@@ -1,4 +1,2 @@
-# Assistant adopteunmec.com 
+# Assistant adopteunmec.com - Chrome ext
 (French dating Website)
-
-Setup steps to be completed
