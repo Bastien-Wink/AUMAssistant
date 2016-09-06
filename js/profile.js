@@ -1,5 +1,8 @@
 var id = $("#member-id").html().substring(3);
-setProfileOpened(id);
+
+window.addEventListener('focus', function() {
+  setProfileOpened(id);
+});
 
 //112884989 is a girl created on the 18th of may 2016. Prefix for women : 1, men: 2. So id = 12884989
 $(".profil-encart-sub-infos div").before("<span>Nouveau profile : " + Math.round(((id + "").substring(1)) * 100 / (12884989)) + "%" + "</span>")
