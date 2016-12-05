@@ -58,7 +58,7 @@ function setProfileBurned(id) {
             'burnedIds': result.burnedIds
         }, function() {
             // Notify that we saved.
-            console.log(result.burnedIds.length + " burnedIds (including new one) ");
+            console.log(result.burnedIds.length + " burnedIds (including new one) " . id);
             console.log("" + result.burnedIds);
         });
     });

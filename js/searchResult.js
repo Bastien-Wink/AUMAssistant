@@ -256,13 +256,13 @@ function init() {
 }
 
 $(document).on("click", ".someone .burnButton", function() {
+    setProfileBurned($(this).closest(".someone").find(".send-charm").attr("data-id"));
     burnedDisplay($(this).closest(".someone"));
-    setProfileBurned($(this).closest(".someone").find(".user-avatar a").attr("href").replace(/https\:\/\/www.adopteunmec.com\/profile\//g, ""));
 });
 
 $(document).on("click", ".send-charm", function(event) {
-    charmedDisplay($(this).closest(".someone"));
     setProfileCharmed($(this).attr("data-id"));
+    charmedDisplay($(this).closest(".someone"));
 });
 
 $(document).on("click", "#openAll", function(event) {
