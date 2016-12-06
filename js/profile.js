@@ -44,3 +44,5 @@ $(document).on("click", ".charm", function(event) {
 $(document).on("click", "#skip", function(event) {
     window.close();
 });
+
+$("#header-user > div.user-popularity > div.popularity-value").html($("#header-box-user > ul:nth-child(2) > li:nth-child(2) > a").html());

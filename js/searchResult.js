@@ -253,10 +253,13 @@ function init() {
         });
 
     });
+
+    $("#header-user > div.user-popularity > div.popularity-value").html($("#header-box-user > ul:nth-child(2) > li:nth-child(2) > a").html());
+
 }
 
 $(document).on("click", ".someone .burnButton", function() {
-    setProfileBurned($(this).closest(".someone").find(".send-charm").attr("data-id"));
+    setProfileBurned($(this).closest(".phpssomeone").find(".send-charm").attr("data-id"));
     burnedDisplay($(this).closest(".someone"));
 });
 
