@@ -1,7 +1,7 @@
 var id = $("#member-id").html().substring(3);
 
-window.addEventListener('focus', function() {
-  setProfileOpened(id);
+window.addEventListener('focus', function () {
+    setProfileOpened(id);
 });
 
 //112884989 is a girl created on the 18th of may 2016. Prefix for women : 1, men: 2. So id = 12884989
@@ -10,8 +10,8 @@ $(".actions-block").after(
     '<div class="actions-block"><button id="skip" data-id="' + id + '" class="btn btn-full btn-mauvelous btn-general">Passer <span class="icon-flake"></span></button></div>' +
     '<div class="actions-block"><button id="hide" data-id="' + id + '" class="btn btn-full btn-mauvelous btn-general">Bruler <span class="icon-trash icon-paperplane"></span></button></div>')
 $("#encart-popularite").attr("style", "margin-left:-750px;bottom: 0px; display: block; z-index: 1;")
-$("#hide").attr("style", "height: 40px;font-size: 2.3rem;background: orangered;")
-$("#skip").attr("style", "height: 40px;font-size: 2.3rem;background: orange;")
+$("#hide").attr("style", "height: 50px;font-size: 2.3rem;background: orangered;")
+$("#skip").attr("style", "height: 50px;font-size: 2.3rem;background: orange;")
 
 $("body").highlight("maman");
 $("body").highlight("lol");
@@ -24,24 +24,29 @@ $("body").after(`
         color: white;
         background: red;
       }
+      .v3.profile .actions-block {
+        margin: 10px 0 10px 1%;
+        width: 32%;
+        display: inline-block;
+      }
       </style>
 `);
 
-$(document).on("click", "#hide", function(event) {
+$(document).on("click", "#hide", function (event) {
     setProfileBurned(id);
-    $("body").fadeOut(1000, function() {
+    $("body").fadeOut(1000, function () {
         window.close();
     })
 });
 
-$(document).on("click", ".charm", function(event) {
+$(document).on("click", ".charm", function (event) {
     setProfileCharmed(id);
-    $(".profil-pic").fadeOut(1000, function() {
+    $(".profil-pic").fadeOut(1000, function () {
         window.close();
     })
 });
 
-$(document).on("click", "#skip", function(event) {
+$(document).on("click", "#skip", function (event) {
     window.close();
 });
 
