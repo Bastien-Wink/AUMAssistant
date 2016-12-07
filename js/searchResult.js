@@ -9,7 +9,7 @@ $("#main").after(`
     <div class="extentionSettingsContainer">
       <div class="extentionSettingsItem">
         <input type="checkbox" id="autoVisit" /> Visites auto<br/>
-        <input type="checkbox" id="hideSeen" /> Cacher les profiles ouverts
+        <input type="checkbox" id="hideSeen" /> Cacher les profiles ouverts ou vide
       </div>
       <div class="extentionSettingsItem">
         <input type="checkbox" id="hideCharmed" /> Cacher les profiles charm&eacute;s<br/>
@@ -210,6 +210,12 @@ function manageSomeone(element, result) {
         } else {
             openedDisplay(element);
         }
+    } else if (element.find(".empty-desc").length > 0) {
+        if (result.hideSeen == true) {
+            hideElement(element);
+        } else {
+            newDisplay(element);
+        }
     } else {
         newDisplay(element);
     }
@@ -259,7 +265,7 @@ function init() {
 }
 
 $(document).on("click", ".someone .burnButton", function() {
-    setProfileBurned($(this).closest(".phpssomeone").find(".send-charm").attr("data-id"));
+    setProfileBurned($(this).closest(".someone").find(".send-charm").attr("data-id"));
     burnedDisplay($(this).closest(".someone"));
 });
 

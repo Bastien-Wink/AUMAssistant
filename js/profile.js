@@ -34,6 +34,7 @@ $("body").after(`
 
 $(document).on("click", "#hide", function (event) {
     setProfileBurned(id);
+    //Todo that should be a callback instead of a timer
     $("body").fadeOut(1000, function () {
         window.close();
     })
@@ -41,6 +42,7 @@ $(document).on("click", "#hide", function (event) {
 
 $(document).on("click", ".charm", function (event) {
     setProfileCharmed(id);
+    //Todo that should be a callback instead of a timer
     $(".profil-pic").fadeOut(1000, function () {
         window.close();
     })
