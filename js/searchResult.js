@@ -111,13 +111,13 @@ $("body").after(`
         padding: 5px 10px;
       }
       .extentionSettingsContainer{
-        width: 800px;
+        width: 870px;
         margin: auto;
       }
       .extentionSettingsItem {
         float: left;
         padding: 0 0 0 64px;
-        width: 200px;
+        width: 220px;
       }
     </style>`);
 
