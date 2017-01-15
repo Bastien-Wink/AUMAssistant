@@ -8,7 +8,7 @@ chrome.runtime.onMessage.addListener(
             case "setCount":
                 chrome.browserAction.setBadgeText({
                     text: "" + message.count,
-                    tabId: sender.tad.id
+                    tabId: sender.tab.id
                 });
                 break;
             default:
