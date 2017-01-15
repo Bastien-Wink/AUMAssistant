@@ -3,9 +3,9 @@
     "version": "1.0",
     "manifest_version": 2,
     "icons": {
-        "16": "img/aum_16.png",
-        "48": "img/aum_48.png",
-        "128": "img/aum_128.png"
+        "16": "img/icon16.png",
+        "32": "img/icon32.png",
+        "128": "img/icon128.png"
     },
     "background": {
         "persistent": false,

@@ -1,6 +1,20 @@
+function closePageOnceNotificationDisplayed() { //todo : find a better name ...
+    console.log("closePageOnceNotificationDisplayed");
+    if($(".ajax-notification.person.notification-picto-charm").length > 0)
+        window.close();
+    else {
+        setTimeout(closePageOnceNotificationDisplayed, 100)
+    }
+}
+
 function scrollBlink() {
     $(window).scrollTop($(window).scrollTop() + 1);
     $(window).scrollTop($(window).scrollTop() - 1);
+}
+
+
+function getLocalStorage(callback) {
+    chrome.storage.local.get(['openedIds', 'burnedIds', 'charmedIds', 'hideSeen', 'hideCharmed', 'hideBurned'], callback);
 }
 
 function hideElement(element) {
@@ -42,9 +56,10 @@ function openedDisplay(element) {
     element.find(".heading-box").before("<div class='openedLabel'>Profile ouvert</div>");
 }
 
-function setProfileBurned(id) {
-    chrome.storage.local.get('burnedIds', function(result) {
+function setProfileBurned(id, callback = null) {
+    chrome.storage.local.get('burnedIds', function (result) {
 
+        console.log("burning " + id)
         if (result.burnedIds instanceof Array == false)
             result.burnedIds = new Array;
 
@@ -56,16 +71,19 @@ function setProfileBurned(id) {
 
         chrome.storage.local.set({
             'burnedIds': result.burnedIds
-        }, function() {
+        }, function () {
             // Notify that we saved.
-            console.log(result.burnedIds.length + " burnedIds (including new one) " . id);
+            console.log(result.burnedIds.length + " burnedIds (including new one) " + id);
             console.log("" + result.burnedIds);
+            if(callback instanceof Function){
+                callback();
+            }
         });
     });
 }
 
-function setProfileCharmed(id) {
-    chrome.storage.local.get('charmedIds', function(result) {
+function setProfileCharmed(id, callback = null) {
+    chrome.storage.local.get('charmedIds', function (result) {
 
         if (result.charmedIds instanceof Array == false)
             result.charmedIds = new Array;
@@ -78,16 +96,19 @@ function setProfileCharmed(id) {
 
         chrome.storage.local.set({
             'charmedIds': result.charmedIds
-        }, function() {
+        }, function () {
             // Notify that we saved.
             console.log(result.charmedIds.length + " charmedIds (including new one) ");
             console.log("" + result.charmedIds);
+            if(callback instanceof Function){
+                setTimeout(callback, 500);
+            }
         });
     });
 }
 
 function setProfileOpened(id) {
-    chrome.storage.local.get('openedIds', function(result) {
+    chrome.storage.local.get('openedIds', function (result) {
 
         if (result.openedIds instanceof Array == false)
             result.openedIds = new Array;
@@ -100,7 +121,7 @@ function setProfileOpened(id) {
 
         chrome.storage.local.set({
             'openedIds': result.openedIds
-        }, function() {
+        }, function () {
             // Notify that we saved.
             console.log(result.openedIds.length + " openedIds (including new one) ");
             console.log("" + result.openedIds);
@@ -109,30 +130,43 @@ function setProfileOpened(id) {
 
 }
 
-jQuery.fn.highlight = function(pat) {
- function innerHighlight(node, pat) {
-  var skip = 0;
-  if (node.nodeType == 3) {
-   var pos = node.data.toUpperCase().indexOf(pat);
-   if (pos >= 0) {
-    var spannode = document.createElement('span');
-    spannode.className = 'highlight';
-    var middlebit = node.splitText(pos);
-    var endbit = middlebit.splitText(pat.length);
-    var middleclone = middlebit.cloneNode(true);
-    spannode.appendChild(middleclone);
-    middlebit.parentNode.replaceChild(spannode, middlebit);
-    skip = 1;
-   }
-  }
-  else if (node.nodeType == 1 && node.childNodes && !/(script|style)/i.test(node.tagName)) {
-   for (var i = 0; i < node.childNodes.length; ++i) {
-    i += innerHighlight(node.childNodes[i], pat);
-   }
-  }
-  return skip;
- }
- return this.length && pat && pat.length ? this.each(function() {
-  innerHighlight(this, pat.toUpperCase());
- }) : this;
+function isCharmed(id, localStorage) {
+    return $.inArray(parseInt(id), localStorage.charmedIds) > -1;
+}
+
+function isBurned(id, localStorage) {
+    return $.inArray(parseInt(id), localStorage.burnedIds) > -1;
+}
+
+function isOpened(id, localStorage) {
+    return $.inArray(parseInt(id), localStorage.openedIds) > -1;
+}
+
+jQuery.fn.highlight = function (pat) {
+    function innerHighlight(node, pat) {
+        var skip = 0;
+        if (node.nodeType == 3) {
+            var pos = node.data.toUpperCase().indexOf(pat);
+            if (pos >= 0) {
+                var spannode = document.createElement('span');
+                spannode.className = 'highlight';
+                var middlebit = node.splitText(pos);
+                var endbit = middlebit.splitText(pat.length);
+                var middleclone = middlebit.cloneNode(true);
+                spannode.appendChild(middleclone);
+                middlebit.parentNode.replaceChild(spannode, middlebit);
+                skip = 1;
+            }
+        }
+        else if (node.nodeType == 1 && node.childNodes && !/(script|style)/i.test(node.tagName)) {
+            for (var i = 0; i < node.childNodes.length; ++i) {
+                i += innerHighlight(node.childNodes[i], pat);
+            }
+        }
+        return skip;
+    }
+
+    return this.length && pat && pat.length ? this.each(function () {
+        innerHighlight(this, pat.toUpperCase());
+    }) : this;
 };

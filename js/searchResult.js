@@ -121,23 +121,23 @@ $("body").after(`
       }
     </style>`);
 
-chrome.storage.local.get(['hideSeen', 'hideCharmed', 'hideBurned'], function(result) {
+chrome.storage.local.get(['hideSeen', 'hideCharmed', 'hideBurned'], function (result) {
     if (result.hideSeen == true) {
         $("input#hideSeen").prop('checked', true);
     }
 
-    $("input#hideSeen").on("change", function() {
+    $("input#hideSeen").on("change", function () {
 
         chrome.storage.local.set({
             'hideSeen': $(this).is(':checked')
         });
-        init();
+        getLocalStorage(initSearchResult);
     });
 
     if (result.hideCharmed == true) {
         $("input#hideCharmed").prop('checked', true);
     }
-    $("input#hideCharmed").on("change", function() {
+    $("input#hideCharmed").on("change", function () {
 
         chrome.storage.local.set({
             'hideCharmed': $(this).is(':checked')
@@ -148,7 +148,7 @@ chrome.storage.local.get(['hideSeen', 'hideCharmed', 'hideBurned'], function(res
     if (result.hideBurned == true) {
         $("input#hideBurned").prop('checked', true);
     }
-    $("input#hideBurned").on("change", function() {
+    $("input#hideBurned").on("change", function () {
 
         chrome.storage.local.set({
             'hideBurned': $(this).is(':checked')
@@ -177,7 +177,7 @@ function visitNext() {
         console.log("No url found in " + element)
     }
 
-    setTimeout(function() {
+    setTimeout(function () {
         $(".visitingMark").remove();
         element.addClass("visited");
         element.find(".user-avatar").after("<div class='visitedMark'></div>")
@@ -186,32 +186,34 @@ function visitNext() {
 
 }
 
-function manageSomeone(element, result) {
+function manageSomeone(element, localStorage) {
     if (element.find(".send-charm").attr("data-id") == undefined) {
         console.log(element.find(".send-charm"));
         return;
     }
 
-    if ($.inArray(parseInt(element.find(".send-charm").attr("data-id")), result.charmedIds) > -1) {
-        if (result.hideCharmed == true) {
+    if (isCharmed(element.find(".send-charm").attr("data-id"), localStorage)) {
+        if (localStorage.hideCharmed == true) {
             hideElement(element);
         } else {
             charmedDisplay(element);
         }
-    } else if ($.inArray(parseInt(element.find(".send-charm").attr("data-id")), result.burnedIds) > -1) {
-        if (result.hideBurned == true) {
+    } else if (isBurned(element.find(".send-charm").attr("data-id"), localStorage)) {
+
+        if (localStorage.hideBurned == true) {
             hideElement(element);
         } else {
             burnedDisplay(element);
         }
-    } else if ($.inArray(parseInt(element.find(".send-charm").attr("data-id")), result.openedIds) > -1) {
-        if (result.hideSeen == true) {
+    } else if (isOpened(element.find(".send-charm").attr("data-id"), localStorage)) {
+
+        if (localStorage.hideSeen == true) {
             hideElement(element);
         } else {
             openedDisplay(element);
         }
     } else if (element.find(".empty-desc").length > 0) {
-        if (result.hideSeen == true) {
+        if (localStorage.hideSeen == true) {
             hideElement(element);
         } else {
             newDisplay(element);
@@ -220,73 +222,67 @@ function manageSomeone(element, result) {
         newDisplay(element);
     }
 }
+function initSearchResult(localStorage) {
+    console.log("hideSeen : " + localStorage.hideSeen);
+    console.log("hideCharmed : " + localStorage.hideCharmed);
+    console.log("hideBurned : " + localStorage.hideBurned);
 
-function init() {
-    chrome.storage.local.get(['openedIds', 'burnedIds', 'charmedIds', 'hideSeen', 'hideCharmed', 'hideBurned'], function(result) {
+    if (localStorage.openedIds instanceof Array == false)
+        localStorage.openedIds = new Array;
+    if (localStorage.burnedIds instanceof Array == false)
+        localStorage.burnedIds = new Array;
+    if (localStorage.charmedIds instanceof Array == false)
+        localStorage.charmedIds = new Array;
 
-        console.log("hideSeen : " + result.hideSeen);
-        console.log("hideCharmed : " + result.hideCharmed);
-        console.log("hideBurned : " + result.hideBurned);
+    console.log(localStorage.openedIds.length + " openedIds : ");
+    console.log("" + localStorage.openedIds);
 
-        if (result.openedIds instanceof Array == false)
-            result.openedIds = new Array;
-        if (result.burnedIds instanceof Array == false)
-            result.burnedIds = new Array;
-        if (result.charmedIds instanceof Array == false)
-            result.charmedIds = new Array;
+    console.log(localStorage.burnedIds.length + " burnedIds : ");
+    console.log("" + localStorage.burnedIds);
 
-        console.log(result.openedIds.length + " openedIds : ");
-        console.log("" + result.openedIds);
+    console.log(localStorage.charmedIds.length + " charmedIds : ");
+    console.log("" + localStorage.charmedIds);
 
-        console.log(result.burnedIds.length + " burnedIds : ");
-        console.log("" + result.burnedIds);
+    countHidden = 0;
+    chrome.runtime.sendMessage({
+        type: "setCount",
+        count: countHidden
+    });
 
-        console.log(result.charmedIds.length + " charmedIds : ");
-        console.log("" + result.charmedIds);
+    $('.someone .user-avatar').each(function () {
+        manageSomeone($(this).closest(".someone"), localStorage);
+    });
 
-        countHidden = 0;
-        chrome.runtime.sendMessage({
-            type: "setCount",
-            count: countHidden
-        });
-
-        $('.someone .user-avatar').each(function() {
-            manageSomeone($(this).closest(".someone"), result);
-        });
-
-        $('body').arrive('.someone .user-avatar', function() {
-            manageSomeone($(this).closest(".someone"), result);
-        });
-
+    $('body').arrive('.someone .user-avatar', function () {
+        manageSomeone($(this).closest(".someone"), localStorage);
     });
 
     $("#header-user > div.user-popularity > div.popularity-value").html($("#header-box-user > ul:nth-child(2) > li:nth-child(2) > a").html());
-
 }
 
-$(document).on("click", ".someone .burnButton", function() {
+$(document).on("click", ".someone .burnButton", function () {
     setProfileBurned($(this).closest(".someone").find(".send-charm").attr("data-id"));
     burnedDisplay($(this).closest(".someone"));
 });
 
-$(document).on("click", ".send-charm", function(event) {
+$(document).on("click", ".send-charm", function (event) {
     setProfileCharmed($(this).attr("data-id"));
     charmedDisplay($(this).closest(".someone"));
 });
 
-$(document).on("click", "#openAll", function(event) {
+$(document).on("click", "#openAll", function (event) {
     var count = 0;
-    $(".someone:visible .user-grid-title a").each(function(e) {
+    $(".someone:visible .user-grid-title a").each(function (e) {
         count = count + 1;
-        if (count >= 10) {
+        if (count >= 15) {
             return false;
         }
         window.open($(this).attr("href"), '_blank');
     });
 });
 
-$(document).on("change", "#autoVisit", function(event) {
+$(document).on("change", "#autoVisit", function (event) {
     visitNext()
 });
 
-init();
+getLocalStorage(initSearchResult);
