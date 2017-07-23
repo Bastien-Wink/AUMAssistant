@@ -23,7 +23,8 @@ $(".mail").html("message<span class='icon-messages'></span>");
 $("body").highlight("maman");
 $("body").highlight("lol");
 $("body").highlight("swag");
-
+$("body").highlight(" jours");
+$("body").highlight("mois");
 $("body").highlight("tpmp");
 
 $("body").after(`
@@ -48,8 +49,8 @@ $("body").after(`
       }
       #encart-popularite{
         margin-left:-750px !important;
-        bottom: 0px !important; 
-        display: block !important; 
+        bottom: 0px !important;
+        display: block !important;
         z-index: 1 !important;
       }
       .actions-block button{
@@ -79,7 +80,10 @@ $(document).on("click", "#skip", function () {
 // So you have just to use
 $('*').bind('keypress', function (e) {
     if (e.which === 51 || e.which === 34) { // 3
-        $(".charm").click();
+        if($("#header-charms-counter")[0].textContent.indexOf("0 charme") == -1)
+          $(".charm").click();
+        else
+          alert("0 charm");
     }
     else if (e.which === 49 || e.which === 38) { // 1
         $("#burn").click();
@@ -105,4 +109,3 @@ function showStatus(localStorage) {
 }
 
 getLocalStorage(showStatus);
-
