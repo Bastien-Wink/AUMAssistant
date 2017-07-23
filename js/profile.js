@@ -64,7 +64,10 @@ $("body").after(`
 `);
 
 $(document).on("click", ".charm", function () {
+  if($("#header-charms-counter")[0].textContent.indexOf("0 charme") == -1)
     setProfileCharmed(id, closePageOnceNotificationDisplayed);
+  else
+    alert("0 charm");
 });
 
 $(document).on("click", "#burn", function () {
@@ -80,10 +83,7 @@ $(document).on("click", "#skip", function () {
 // So you have just to use
 $('*').bind('keypress', function (e) {
     if (e.which === 51 || e.which === 34) { // 3
-        if($("#header-charms-counter")[0].textContent.indexOf("0 charme") == -1)
-          $(".charm").click();
-        else
-          alert("0 charm");
+        $(".charm").click();
     }
     else if (e.which === 49 || e.which === 38) { // 1
         $("#burn").click();
