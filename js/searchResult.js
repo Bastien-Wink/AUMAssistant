@@ -142,7 +142,7 @@ chrome.storage.local.get(['hideSeen', 'hideCharmed', 'hideBurned'], function (re
         chrome.storage.local.set({
             'hideCharmed': $(this).is(':checked')
         });
-        init();
+        getLocalStorage(initSearchResult);
     });
 
     if (result.hideBurned == true) {
@@ -153,7 +153,7 @@ chrome.storage.local.get(['hideSeen', 'hideCharmed', 'hideBurned'], function (re
         chrome.storage.local.set({
             'hideBurned': $(this).is(':checked')
         });
-        init();
+        getLocalStorage(initSearchResult);
     });
 });
 

@@ -64,7 +64,7 @@ $("body").after(`
 `);
 
 $(document).on("click", ".charm", function () {
-  if($("#header-charms-counter")[0].textContent.indexOf("0 charme") == -1)
+  if($("#header-charms-counter")[0].textContent.indexOf("\t0 charme") == -1)
     setProfileCharmed(id, closePageOnceNotificationDisplayed);
   else
     alert("0 charm");
